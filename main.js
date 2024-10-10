@@ -139,14 +139,14 @@ class Tree {
       }
       preOrder(callback) {
             if (!callback) {
-              throw new Error('Callback function is required');
+              return new Error('Callback function is required');
             }
             this.preOrderTraversal(this.root, callback);
       }
           
       preOrderTraversal(node, callback) {
             if (node === null) {
-              return;
+              return null;
             }
             callback(node);
             this.preOrderTraversal(node.left, callback);
@@ -166,6 +166,58 @@ class Tree {
             this.postOrderTraversal(node.right, callback);
             callback(node);
       }
+      height(node) {
+            if (node === null) {
+                  return 0;
+            }
+            if (node.left === null && node.right === null) {
+                  return 0;
+            }
+            return Math.max(this.height(node.left), this.height(node.right)) + 1;
+      }
+      depth(node) {
+            if (node === null) {
+                  return -1;
+            }
+            if(node === this.root) {
+                  return 0;
+            }
+            return this.depthTraversal(this.root, node, 0);
+         
+      }
+      depthTraversal(node, target, depth) {
+            
+            if (node === null) {
+                 return -1;
+            }
+            if (node === target) {
+                  return depth;
+            }
+            const leftDepth = this.depthTraversal(node.left, target, depth + 1);
+            if (leftDepth !== -1) {
+                  return leftDepth;
+            }
+            return this.depthTraversal(node.right, target, depth + 1);
+      }
+      isBalanced(node) {
+            if (node === null) {
+                  return true;
+            }
+            
+            const leftHeight = this.height(node.left);
+            const rightHeight = this.height(node.right);
+            
+            if (Math.abs(leftHeight - rightHeight) > 1) {
+            return false;
+            }
+            
+            return this.isBalanced(node.left) && this.isBalanced(node.right);   
+      }
+      rebalance() {
+            const nodes = [];
+            this.inOrderTraversal(this.root, (node) => nodes.push(node.value));
+            this.root = this.buildTree(nodes);
+      }   
       buildTree(array) {
             // build a tree from an array insert each element in the tree
             for (let i = 0; i < array.length; i++) {
@@ -188,8 +240,3 @@ class Tree {
       }
 }
 
-const tree = new Tree();
-tree.buildTree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
-
-console.log(tree.inOrder(node => console.log(node.data)));
-console.log(tree.prettyPrint(tree.root));
